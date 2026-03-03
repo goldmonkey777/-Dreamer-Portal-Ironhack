@@ -95,3 +95,71 @@ Opcional com GitHub CLI:
 ```bash
 gh repo create dreamerportal-ironhack --public --source=. --remote=origin --push
 ```
+
+## Deploy passo a passo (estilo Ironhack)
+
+### Fase 1 — Backend no Render
+
+1. Acesse Render e clique em **New +** → **Blueprint**
+2. Selecione este repositório no GitHub
+3. Confirme o arquivo `render.yaml` na raiz
+4. Configure as variáveis secretas:
+   - `MONGODB_URI`
+   - `JWT_SECRET`
+   - `CLOUDINARY_CLOUD_NAME`
+   - `CLOUDINARY_API_KEY`
+   - `CLOUDINARY_API_SECRET`
+5. Em `CORS_ORIGIN`, use temporariamente:
+
+```text
+http://localhost:5173
+```
+
+1. Deploy e valide o health check:
+
+```text
+https://SEU-BACKEND.onrender.com/health
+```
+
+Se retornar `success: true`, backend aprovado.
+
+### Fase 2 — Frontend no Vercel
+
+1. Acesse Vercel e clique em **Add New Project**
+2. Importe o mesmo repositório
+3. Em configuração do projeto, use:
+   - **Root Directory**: `client`
+   - **Build Command**: `npm run build`
+   - **Output Directory**: `dist`
+4. Variável de ambiente obrigatória:
+
+```text
+VITE_API_URL=https://SEU-BACKEND.onrender.com
+```
+
+1. Faça deploy e teste login/signup.
+
+### Fase 3 — Conectar produção
+
+1. Copie a URL final do frontend Vercel
+2. Volte no Render e atualize `CORS_ORIGIN` para:
+
+```text
+http://localhost:5173,https://SEU-FRONTEND.vercel.app
+```
+
+1. Redeploy backend no Render
+2. Teste fluxo completo em produção:
+   - signup
+   - criar ciclo
+   - criar sonho
+   - criar ação
+   - upload de imagem
+
+### Fase 4 — Fechamento para avaliação
+
+Atualize este README com:
+
+- Link frontend produção
+- Link backend produção (`/health`)
+- Vídeo curto de demo (opcional, recomendado)

@@ -10,7 +10,21 @@ import { taskRoutes } from './modules/tasks/task.routes.js';
 
 export const app = express();
 
-app.use(cors({ origin: env.corsOrigin }));
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      if (!origin) {
+        return callback(null, true);
+      }
+
+      if (env.corsOrigins.includes('*') || env.corsOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error('CORS origin not allowed'));
+    }
+  })
+);
 app.use(express.json({ limit: '5mb' }));
 app.use(morgan('dev'));
 
