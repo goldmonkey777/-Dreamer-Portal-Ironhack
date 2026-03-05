@@ -16,5 +16,7 @@ export const env = {
   corsOrigins: parsedCorsOrigins,
   cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
-  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
+  openAiApiKey: process.env.OPENAI_API_KEY || '',
+  openAiModel: process.env.OPENAI_MODEL || 'gpt-4.1-mini'
 };

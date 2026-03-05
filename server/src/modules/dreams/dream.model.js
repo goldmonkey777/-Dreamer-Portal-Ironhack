@@ -16,10 +16,25 @@ const dreamSchema = new mongoose.Schema(
       }
     ],
     analysis: {
+      status: {
+        type: String,
+        enum: ['pending', 'processing', 'processed', 'failed'],
+        default: 'pending'
+      },
       summary: { type: String, default: '' },
       symbols: [{ type: String }],
       archetypes: [{ type: String }],
-      processed: { type: Boolean, default: false }
+      suggestedAction: { type: String, default: '' },
+      disclaimer: {
+        type: String,
+        default:
+          'Esta interpretação é simbólica e reflexiva. Não substitui aconselhamento clínico, psicológico, espiritual ou médico.'
+      },
+      source: { type: String, default: 'pending' },
+      model: { type: String, default: '' },
+      processed: { type: Boolean, default: false },
+      processedAt: { type: Date, default: null },
+      error: { type: String, default: '' }
     },
     isArchived: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null, index: true }

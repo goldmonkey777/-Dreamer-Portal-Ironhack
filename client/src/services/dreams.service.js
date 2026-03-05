@@ -20,5 +20,9 @@ export const dreamsService = {
   uploadAttachment: async (dreamId, dataUri) => {
     const { data } = await http.post(`/api/dreams/${dreamId}/attachments`, { dataUri });
     return data;
+  },
+  analyze: async (dreamId) => {
+    const { data } = await http.post(`/api/dreams/${dreamId}/analyze`);
+    return data;
   }
 };

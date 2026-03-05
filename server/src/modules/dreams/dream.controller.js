@@ -30,3 +30,12 @@ export const uploadDreamAttachment = asyncHandler(async (req, res) => {
   const dream = await dreamService.attachImage(req.user.id, req.params.id, req.body.dataUri);
   res.status(200).json({ success: true, data: dream });
 });
+
+export const analyzeDream = asyncHandler(async (req, res) => {
+  const dream = await dreamService.requestDreamAnalysis(req.user.id, req.params.id);
+  res.status(202).json({
+    success: true,
+    message: 'Dream analysis queued',
+    data: dream
+  });
+});

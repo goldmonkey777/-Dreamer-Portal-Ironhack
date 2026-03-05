@@ -3,6 +3,7 @@ import { Project } from '../projects/project.model.js';
 import { Dream } from './dream.model.js';
 import { AppError } from '../../shared/errors/AppError.js';
 import { uploadDreamAttachment } from '../../shared/utils/upload.js';
+import { enqueueDreamAnalysis } from './dream.analysisQueue.js';
 
 const ensureObjectId = (id) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
@@ -35,12 +36,24 @@ export const listDreamsByProject = async (ownerId, projectId, query) => {
 
 export const createDream = async (ownerId, projectId, payload) => {
   await ensureProjectOwnership(projectId, ownerId);
-  return Dream.create({
+  const created = await Dream.create({
     ...payload,
     moodTags: payload.moodTags?.map((tag) => tag.toLowerCase()) || [],
     owner: ownerId,
-    project: projectId
+    project: projectId,
+    analysis: {
+      status: 'pending',
+      summary: '',
+      symbols: [],
+      archetypes: [],
+      suggestedAction: '',
+      processed: false,
+      error: ''
+    }
   });
+
+  enqueueDreamAnalysis(created._id);
+  return created;
 };
 
 export const getDreamById = async (ownerId, dreamId) => {
@@ -55,17 +68,41 @@ export const getDreamById = async (ownerId, dreamId) => {
 
 export const updateDream = async (ownerId, dreamId, payload) => {
   ensureObjectId(dreamId);
+  const shouldReprocessAnalysis =
+    payload.title !== undefined ||
+    payload.content !== undefined ||
+    payload.moodTags !== undefined ||
+    payload.lucidityLevel !== undefined ||
+    payload.dreamDate !== undefined;
+
   const updated = await Dream.findOneAndUpdate(
     { _id: dreamId, owner: ownerId, deletedAt: null },
     {
       ...payload,
-      ...(payload.moodTags ? { moodTags: payload.moodTags.map((tag) => tag.toLowerCase()) } : {})
+      ...(payload.moodTags ? { moodTags: payload.moodTags.map((tag) => tag.toLowerCase()) } : {}),
+      ...(shouldReprocessAnalysis
+        ? {
+            analysis: {
+              status: 'pending',
+              summary: '',
+              symbols: [],
+              archetypes: [],
+              suggestedAction: '',
+              processed: false,
+              error: ''
+            }
+          }
+        : {})
     },
     { new: true }
   );
 
   if (!updated) {
     throw new AppError('Dream not found', 404);
+  }
+
+  if (shouldReprocessAnalysis) {
+    enqueueDreamAnalysis(updated._id);
   }
 
   return updated;
@@ -91,5 +128,18 @@ export const attachImage = async (ownerId, dreamId, dataUri) => {
   const attachment = await uploadDreamAttachment(dataUri);
   dream.attachments.push(attachment);
   await dream.save();
+  return dream;
+};
+
+export const requestDreamAnalysis = async (ownerId, dreamId) => {
+  const dream = await getDreamById(ownerId, dreamId);
+  dream.analysis = {
+    ...dream.analysis,
+    status: 'pending',
+    processed: false,
+    error: ''
+  };
+  await dream.save();
+  enqueueDreamAnalysis(dream._id);
   return dream;
 };

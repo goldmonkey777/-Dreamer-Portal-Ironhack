@@ -158,6 +158,15 @@ export const ProjectDetailPage = () => {
     }
   };
 
+  const handleAnalyzeDream = async (dreamId) => {
+    try {
+      await dreamsService.analyze(dreamId);
+      await loadData();
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || 'Não foi possível solicitar análise do sonho');
+    }
+  };
+
   const handleEditTask = async (task) => {
     const title = window.prompt('Editar título da ação:', task.title);
     if (!title) {
@@ -309,6 +318,28 @@ export const ProjectDetailPage = () => {
                 <button type="button" onClick={() => handleDeleteDream(dream._id)}>
                   Arquivar
                 </button>
+                {' '}
+                <button
+                  type="button"
+                  onClick={() => handleAnalyzeDream(dream._id)}
+                  disabled={dream.analysis?.status === 'pending' || dream.analysis?.status === 'processing'}
+                >
+                  {dream.analysis?.status === 'pending' || dream.analysis?.status === 'processing'
+                    ? 'Analisando...'
+                    : 'Reanalisar'}
+                </button>
+                <div style={{ marginTop: 6 }}>
+                  <small>
+                    Status da interpretação:{' '}
+                    {dream.analysis?.status === 'processed'
+                      ? 'processada'
+                      : dream.analysis?.status === 'failed'
+                        ? 'falhou'
+                        : dream.analysis?.status === 'processing'
+                          ? 'em processamento'
+                          : 'pendente'}
+                  </small>
+                </div>
                 {Array.isArray(dream.attachments) && dream.attachments.length > 0 ? (
                   <div>
                     <small>Anexos:</small>{' '}
@@ -324,6 +355,41 @@ export const ProjectDetailPage = () => {
                       </a>
                     ))}
                   </div>
+                ) : null}
+
+                {dream.analysis?.status === 'processed' ? (
+                  <div
+                    style={{
+                      marginTop: 8,
+                      padding: 8,
+                      border: '1px solid #ddd',
+                      borderRadius: 8,
+                      display: 'grid',
+                      gap: 6
+                    }}
+                  >
+                    <strong>Leitura simbólica</strong>
+                    <p style={{ margin: 0 }}>{dream.analysis?.summary || 'Sem resumo disponível.'}</p>
+                    {Array.isArray(dream.analysis?.symbols) && dream.analysis.symbols.length > 0 ? (
+                      <small>Símbolos: {dream.analysis.symbols.join(', ')}</small>
+                    ) : null}
+                    {Array.isArray(dream.analysis?.archetypes) && dream.analysis.archetypes.length > 0 ? (
+                      <small>Arquétipos: {dream.analysis.archetypes.join(', ')}</small>
+                    ) : null}
+                    {dream.analysis?.suggestedAction ? (
+                      <small>Ação sugerida: {dream.analysis.suggestedAction}</small>
+                    ) : null}
+                    <small style={{ opacity: 0.8 }}>
+                      {dream.analysis?.disclaimer ||
+                        'Esta interpretação é simbólica e reflexiva. Não substitui aconselhamento profissional.'}
+                    </small>
+                  </div>
+                ) : null}
+
+                {dream.analysis?.status === 'failed' ? (
+                  <small style={{ color: 'crimson', display: 'block', marginTop: 6 }}>
+                    Falha na análise: {dream.analysis?.error || 'erro desconhecido'}
+                  </small>
                 ) : null}
               </li>
             ))}

@@ -2,6 +2,7 @@ import { Router } from 'express';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { validate } from '../../middleware/validate.middleware.js';
 import {
+  analyzeDream,
   createDream,
   deleteDream,
   getDream,
@@ -25,3 +26,4 @@ dreamRoutes.get('/dreams/:id', getDream);
 dreamRoutes.put('/dreams/:id', validate(updateDreamSchema), updateDream);
 dreamRoutes.delete('/dreams/:id', deleteDream);
 dreamRoutes.post('/dreams/:id/attachments', validate(uploadAttachmentSchema), uploadDreamAttachment);
+dreamRoutes.post('/dreams/:id/analyze', analyzeDream);

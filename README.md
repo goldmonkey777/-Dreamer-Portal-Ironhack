@@ -41,6 +41,7 @@ npm run dev
 - Auth: `POST /auth/signup`, `POST /auth/login`, `GET /auth/verify`
 - Projects: `GET/POST /api/projects`, `GET/PUT/DELETE /api/projects/:id`
 - Dreams: `GET/POST /api/projects/:projectId/dreams`, `GET/PUT/DELETE /api/dreams/:id`
+- Dreams Analysis: `POST /api/dreams/:id/analyze` (async reprocessing)
 - Tasks: `GET/POST /api/projects/:projectId/tasks`, `PUT/DELETE /api/tasks/:id`
 
 All domain routes are owner-scoped and implement soft delete where applicable.
@@ -54,6 +55,7 @@ All domain routes are owner-scoped and implement soft delete where applicable.
 - CRUD de ações na UI (criar, editar, status, arquivar)
 - Filtros de ciclos, sonhos e ações
 - Upload de imagem para sonho via Cloudinary (UI + API)
+- Interpretação simbólica assíncrona de sonhos (OpenAI opcional + fallback heurístico local)
 
 ## Como testar upload de imagem
 
