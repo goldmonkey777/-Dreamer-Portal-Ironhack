@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
+import { EmptyState } from '../components/EmptyState';
 import { Navbar } from '../components/Navbar';
+import { PortalLoader } from '../components/PortalLoader';
 import { dreamsService } from '../services/dreams.service';
 import { projectsService } from '../services/projects.service';
 import { tasksService } from '../services/tasks.service';
@@ -8,6 +10,7 @@ import { tasksService } from '../services/tasks.service';
 export const ProjectDetailPage = () => {
   const { id } = useParams();
   const [project, setProject] = useState(null);
+  const [isLoadingPage, setIsLoadingPage] = useState(true);
   const [activeTab, setActiveTab] = useState('dreams');
   const [dreams, setDreams] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -31,19 +34,24 @@ export const ProjectDetailPage = () => {
   );
 
   const loadData = async () => {
-    const [projectResponse, dreamsResponse, tasksResponse] = await Promise.all([
-      projectsService.getById(id),
-      dreamsService.listByProject(id, {
-        mood: dreamFilters.mood || undefined,
-        lucidity: dreamFilters.lucidity || undefined
-      }),
-      tasksService.listByProject(id, {
-        status: taskFilters.status || undefined
-      })
-    ]);
-    setProject(projectResponse.data);
-    setDreams(dreamsResponse.data);
-    setTasks(tasksResponse.data);
+    setIsLoadingPage(true);
+    try {
+      const [projectResponse, dreamsResponse, tasksResponse] = await Promise.all([
+        projectsService.getById(id),
+        dreamsService.listByProject(id, {
+          mood: dreamFilters.mood || undefined,
+          lucidity: dreamFilters.lucidity || undefined
+        }),
+        tasksService.listByProject(id, {
+          status: taskFilters.status || undefined
+        })
+      ]);
+      setProject(projectResponse.data);
+      setDreams(dreamsResponse.data);
+      setTasks(tasksResponse.data);
+    } finally {
+      setIsLoadingPage(false);
+    }
   };
 
   useEffect(() => {
@@ -202,6 +210,10 @@ export const ProjectDetailPage = () => {
     }
   };
 
+  if (isLoadingPage && !project) {
+    return <PortalLoader label="Abrindo seu ciclo..." />;
+  }
+
   if (!project) {
     return (
       <main className="app-shell">
@@ -322,6 +334,12 @@ export const ProjectDetailPage = () => {
             <button type="submit" className="dp-btn">Salvar sonho</button>
           </form>
 
+          {!isLoadingPage && dreams.length === 0 ? (
+            <EmptyState
+              title="Nenhum sonho registrado"
+              description="Registre seu primeiro sonho neste ciclo para começar a leitura simbólica."
+            />
+          ) : null}
           <ul className="dp-list" style={{ marginTop: 12 }}>
             {dreams.map((dream) => (
               <li key={dream._id} className="dp-list-item">
@@ -480,6 +498,12 @@ export const ProjectDetailPage = () => {
             <button type="submit" className="dp-btn">Criar ação</button>
           </form>
 
+          {!isLoadingPage && tasks.length === 0 ? (
+            <EmptyState
+              title="Nenhuma ação criada"
+              description="Transforme um insight em uma ação prática para iniciar seu movimento real."
+            />
+          ) : null}
           <ul className="dp-list" style={{ marginTop: 12 }}>
             {tasks.map((task) => (
               <li key={task._id} className="dp-list-item">

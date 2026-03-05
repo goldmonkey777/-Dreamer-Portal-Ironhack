@@ -1,20 +1,28 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { EmptyState } from '../components/EmptyState';
 import { Navbar } from '../components/Navbar';
+import { PortalLoader } from '../components/PortalLoader';
 import { projectsService } from '../services/projects.service';
 
 export const DashboardPage = () => {
   const [projects, setProjects] = useState([]);
+  const [isLoadingProjects, setIsLoadingProjects] = useState(true);
   const [filters, setFilters] = useState({ search: '', status: '' });
   const [form, setForm] = useState({ title: '', description: '', tags: '' });
   const [error, setError] = useState('');
 
   const loadProjects = async () => {
-    const response = await projectsService.list({
-      search: filters.search || undefined,
-      status: filters.status || undefined
-    });
-    setProjects(response.data);
+    setIsLoadingProjects(true);
+    try {
+      const response = await projectsService.list({
+        search: filters.search || undefined,
+        status: filters.status || undefined
+      });
+      setProjects(response.data);
+    } finally {
+      setIsLoadingProjects(false);
+    }
   };
 
   useEffect(() => {
@@ -153,7 +161,13 @@ export const DashboardPage = () => {
 
       <section className="mystic-panel">
         <h2>Seus Ciclos</h2>
-        {projects.length === 0 ? <p className="page-subtitle">Você ainda não criou ciclos.</p> : null}
+        {isLoadingProjects ? <PortalLoader compact label="Carregando ciclos..." /> : null}
+        {!isLoadingProjects && projects.length === 0 ? (
+          <EmptyState
+            title="Seu portal ainda está vazio"
+            description="Crie seu primeiro ciclo para começar a capturar sonhos, interpretações e ações práticas."
+          />
+        ) : null}
         <ul className="dp-list">
           {projects.map((project) => (
             <li key={project._id} className="dp-list-item">

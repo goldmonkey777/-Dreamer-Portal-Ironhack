@@ -1,11 +1,12 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { PortalLoader } from '../components/PortalLoader';
 
 export const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
-    return <p>Carregando sessão...</p>;
+    return <PortalLoader label="Carregando sessão..." />;
   }
 
   if (!isAuthenticated) {
