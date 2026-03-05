@@ -20,30 +20,34 @@ export const LoginPage = () => {
   };
 
   return (
-    <main>
-      <h1>Entrar no DreamerPortal</h1>
-      <p>Acesse seu portal para continuar registrando sonhos e ações.</p>
-      <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 8, maxWidth: 360 }}>
-        <input
+    <main className="auth-layout">
+      <section className="auth-card">
+        <h1>Entrar no DreamerPortal</h1>
+        <p>Acesse seu portal para continuar registrando sonhos e ações.</p>
+        <form onSubmit={handleSubmit} className="dp-form">
+          <input
+            className="dp-input"
           placeholder="Seu e-mail"
           type="email"
           required
           value={form.email}
           onChange={(event) => setForm({ ...form, email: event.target.value })}
         />
-        <input
+          <input
+            className="dp-input"
           placeholder="Sua senha"
           type="password"
           required
           value={form.password}
           onChange={(event) => setForm({ ...form, password: event.target.value })}
         />
-        <button type="submit">Entrar</button>
-      </form>
-      {error ? <p style={{ color: 'crimson' }}>{error}</p> : null}
-      <p>
-        Ainda não tem conta? <Link to="/signup">Criar conta</Link>
-      </p>
+          <button type="submit" className="dp-btn">Entrar</button>
+        </form>
+        {error ? <p className="dp-error">{error}</p> : null}
+        <p>
+          Ainda não tem conta? <Link to="/signup">Criar conta</Link>
+        </p>
+      </section>
     </main>
   );
 };

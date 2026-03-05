@@ -5,13 +5,13 @@ export const Navbar = () => {
   const { user, logout } = useAuth();
 
   return (
-    <header style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0' }}>
-      <Link to="/dashboard" style={{ fontWeight: 'bold', textDecoration: 'none' }}>
+    <header className="dp-navbar">
+      <Link to="/dashboard" className="dp-brand">
         DreamerPortal · Portal de Sonhos
       </Link>
-      <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-        <span>{user?.name}</span>
-        <button type="button" onClick={logout}>
+      <div className="dp-user">
+        <span className="dp-meta">{user?.name}</span>
+        <button type="button" className="dp-btn dp-btn-secondary" onClick={logout}>
           Sair
         </button>
       </div>

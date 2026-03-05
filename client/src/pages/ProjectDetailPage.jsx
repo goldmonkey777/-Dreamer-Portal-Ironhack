@@ -204,38 +204,47 @@ export const ProjectDetailPage = () => {
 
   if (!project) {
     return (
-      <main style={{ maxWidth: 920, margin: '0 auto', padding: '0 12px' }}>
+      <main className="app-shell">
         <Navbar />
-        <p>Ciclo não encontrado. <Link to="/dashboard">Voltar</Link></p>
+        <p className="page-subtitle">Ciclo não encontrado. <Link to="/dashboard">Voltar</Link></p>
       </main>
     );
   }
 
   return (
-    <main style={{ maxWidth: 920, margin: '0 auto', padding: '0 12px' }}>
+    <main className="app-shell">
       <Navbar />
       <p>
         <Link to="/dashboard">← Voltar para os Ciclos</Link>
       </p>
-      <h1>{project.title}</h1>
-      <p>{project.description}</p>
+      <h1 className="page-title">{project.title}</h1>
+      <p className="page-subtitle">{project.description}</p>
 
-      <section style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
-        <button type="button" onClick={() => setActiveTab('dreams')}>
+      <section className="dp-tabs">
+        <button
+          type="button"
+          className={`dp-tab ${activeTab === 'dreams' ? 'active' : ''}`}
+          onClick={() => setActiveTab('dreams')}
+        >
           Sonhos
         </button>
-        <button type="button" onClick={() => setActiveTab('tasks')}>
+        <button
+          type="button"
+          className={`dp-tab ${activeTab === 'tasks' ? 'active' : ''}`}
+          onClick={() => setActiveTab('tasks')}
+        >
           Ações
         </button>
       </section>
 
       {activeTab === 'dreams' ? (
-        <section>
+        <section className="mystic-panel" style={{ marginBottom: 14 }}>
           <h2>Registros de Sonho</h2>
-          <section style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+          <section className="dp-row" style={{ marginBottom: 12 }}>
             <label style={{ display: 'grid', gap: 4 }}>
               <span>Filtrar por tag de humor</span>
               <input
+                className="dp-input"
                 placeholder="Ex: calma"
                 value={dreamFilters.mood}
                 onChange={(event) =>
@@ -246,6 +255,7 @@ export const ProjectDetailPage = () => {
             <label style={{ display: 'grid', gap: 4 }}>
               <span>Filtrar por lucidez</span>
               <select
+                className="dp-select"
                 value={dreamFilters.lucidity}
                 onChange={(event) =>
                   setDreamFilters((prev) => ({ ...prev, lucidity: event.target.value }))
@@ -261,31 +271,36 @@ export const ProjectDetailPage = () => {
             </label>
           </section>
 
-          <form onSubmit={submitDream} style={{ display: 'grid', gap: 8, maxWidth: 580 }}>
+          <form onSubmit={submitDream} className="dp-form" style={{ maxWidth: 580 }}>
             <input
+              className="dp-input"
               placeholder="Título do sonho"
               value={dreamForm.title}
               onChange={(event) => setDreamForm({ ...dreamForm, title: event.target.value })}
               required
             />
             <textarea
+              className="dp-textarea"
               placeholder="Descreva o sonho com detalhes simbólicos"
               value={dreamForm.content}
               onChange={(event) => setDreamForm({ ...dreamForm, content: event.target.value })}
               required
             />
             <input
+              className="dp-input"
               type="date"
               value={dreamForm.dreamDate}
               onChange={(event) => setDreamForm({ ...dreamForm, dreamDate: event.target.value })}
               required
             />
             <input
+              className="dp-input"
               placeholder="Tags de humor (separadas por vírgula)"
               value={dreamForm.moodTags}
               onChange={(event) => setDreamForm({ ...dreamForm, moodTags: event.target.value })}
             />
             <select
+              className="dp-select"
               value={dreamForm.lucidityLevel}
               onChange={(event) =>
                 setDreamForm({ ...dreamForm, lucidityLevel: Number(event.target.value) })
@@ -300,27 +315,28 @@ export const ProjectDetailPage = () => {
 
             <label style={{ display: 'grid', gap: 4 }}>
               <span>Imagem do sonho (opcional)</span>
-              <input type="file" accept="image/*" onChange={handleDreamAttachmentChange} />
+              <input className="dp-input" type="file" accept="image/*" onChange={handleDreamAttachmentChange} />
             </label>
             {dreamAttachmentFileName ? <small>Arquivo selecionado: {dreamAttachmentFileName}</small> : null}
 
-            <button type="submit">Salvar sonho</button>
+            <button type="submit" className="dp-btn">Salvar sonho</button>
           </form>
 
-          <ul>
+          <ul className="dp-list" style={{ marginTop: 12 }}>
             {dreams.map((dream) => (
-              <li key={dream._id}>
+              <li key={dream._id} className="dp-list-item">
                 <strong>{dream.title}</strong> · {new Date(dream.dreamDate).toLocaleDateString()} · Lucidez{' '}
                 {dream.lucidityLevel}{' '}
-                <button type="button" onClick={() => handleEditDream(dream)}>
+                <button type="button" className="dp-btn dp-btn-secondary" onClick={() => handleEditDream(dream)}>
                   Editar
                 </button>{' '}
-                <button type="button" onClick={() => handleDeleteDream(dream._id)}>
+                <button type="button" className="dp-btn dp-btn-secondary" onClick={() => handleDeleteDream(dream._id)}>
                   Arquivar
                 </button>
                 {' '}
                 <button
                   type="button"
+                  className="dp-btn dp-btn-secondary"
                   onClick={() => handleAnalyzeDream(dream._id)}
                   disabled={dream.analysis?.status === 'pending' || dream.analysis?.status === 'processing'}
                 >
@@ -362,10 +378,11 @@ export const ProjectDetailPage = () => {
                     style={{
                       marginTop: 8,
                       padding: 8,
-                      border: '1px solid #ddd',
+                      border: '1px solid rgba(196, 180, 255, 0.35)',
                       borderRadius: 8,
                       display: 'grid',
-                      gap: 6
+                      gap: 6,
+                      background: 'rgba(20, 27, 58, 0.7)'
                     }}
                   >
                     <strong>Leitura simbólica</strong>
@@ -387,7 +404,7 @@ export const ProjectDetailPage = () => {
                 ) : null}
 
                 {dream.analysis?.status === 'failed' ? (
-                  <small style={{ color: 'crimson', display: 'block', marginTop: 6 }}>
+                  <small className="dp-error" style={{ display: 'block', marginTop: 6 }}>
                     Falha na análise: {dream.analysis?.error || 'erro desconhecido'}
                   </small>
                 ) : null}
@@ -396,12 +413,13 @@ export const ProjectDetailPage = () => {
           </ul>
         </section>
       ) : (
-        <section>
+        <section className="mystic-panel">
           <h2>Ações Derivadas</h2>
-          <section style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+          <section className="dp-row" style={{ marginBottom: 12 }}>
             <label style={{ display: 'grid', gap: 4 }}>
               <span>Filtrar por status</span>
               <select
+                className="dp-select"
                 value={taskFilters.status}
                 onChange={(event) =>
                   setTaskFilters((prev) => ({ ...prev, status: event.target.value }))
@@ -415,19 +433,22 @@ export const ProjectDetailPage = () => {
             </label>
           </section>
 
-          <form onSubmit={submitTask} style={{ display: 'grid', gap: 8, maxWidth: 580 }}>
+          <form onSubmit={submitTask} className="dp-form" style={{ maxWidth: 580 }}>
             <input
+              className="dp-input"
               placeholder="Título da ação"
               value={taskForm.title}
               onChange={(event) => setTaskForm({ ...taskForm, title: event.target.value })}
               required
             />
             <textarea
+              className="dp-textarea"
               placeholder="Descrição da ação"
               value={taskForm.description}
               onChange={(event) => setTaskForm({ ...taskForm, description: event.target.value })}
             />
             <select
+              className="dp-select"
               value={taskForm.status}
               onChange={(event) => setTaskForm({ ...taskForm, status: event.target.value })}
             >
@@ -436,6 +457,7 @@ export const ProjectDetailPage = () => {
               <option value="done">Concluída</option>
             </select>
             <select
+              className="dp-select"
               value={taskForm.priority}
               onChange={(event) => setTaskForm({ ...taskForm, priority: event.target.value })}
             >
@@ -444,6 +466,7 @@ export const ProjectDetailPage = () => {
               <option value="high">Alta</option>
             </select>
             <select
+              className="dp-select"
               value={taskForm.relatedDream || ''}
               onChange={(event) => setTaskForm({ ...taskForm, relatedDream: event.target.value })}
             >
@@ -454,12 +477,12 @@ export const ProjectDetailPage = () => {
                 </option>
               ))}
             </select>
-            <button type="submit">Criar ação</button>
+            <button type="submit" className="dp-btn">Criar ação</button>
           </form>
 
-          <ul>
+          <ul className="dp-list" style={{ marginTop: 12 }}>
             {tasks.map((task) => (
-              <li key={task._id}>
+              <li key={task._id} className="dp-list-item">
                 <strong>{task.title}</strong> ·{' '}
                 {task.status === 'todo'
                   ? 'A fazer'
@@ -468,13 +491,13 @@ export const ProjectDetailPage = () => {
                     : 'Concluída'}{' '}
                 ·{' '}
                 {task.priority === 'low' ? 'Baixa' : task.priority === 'high' ? 'Alta' : 'Média'}{' '}
-                <button type="button" onClick={() => toggleTaskStatus(task)}>
+                <button type="button" className="dp-btn dp-btn-secondary" onClick={() => toggleTaskStatus(task)}>
                   Marcar/Desmarcar conclusão
                 </button>{' '}
-                <button type="button" onClick={() => handleEditTask(task)}>
+                <button type="button" className="dp-btn dp-btn-secondary" onClick={() => handleEditTask(task)}>
                   Editar
                 </button>{' '}
-                <button type="button" onClick={() => handleDeleteTask(task._id)}>
+                <button type="button" className="dp-btn dp-btn-secondary" onClick={() => handleDeleteTask(task._id)}>
                   Arquivar
                 </button>
               </li>
@@ -483,7 +506,7 @@ export const ProjectDetailPage = () => {
         </section>
       )}
 
-      {error ? <p style={{ color: 'crimson' }}>{error}</p> : null}
+      {error ? <p className="dp-error">{error}</p> : null}
     </main>
   );
 };

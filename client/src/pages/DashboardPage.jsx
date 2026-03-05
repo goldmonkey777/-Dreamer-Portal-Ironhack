@@ -79,14 +79,15 @@ export const DashboardPage = () => {
   };
 
   return (
-    <main style={{ maxWidth: 920, margin: '0 auto', padding: '0 12px' }}>
+    <main className="app-shell">
       <Navbar />
-      <h1>DreamerPortal · Ciclos de Sonhos</h1>
+      <h1 className="page-title">DreamerPortal · Ciclos de Sonhos</h1>
 
-      <section style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
+      <section className="dp-row" style={{ marginBottom: 12 }}>
         <label style={{ display: 'grid', gap: 4 }}>
           <span>Buscar ciclo</span>
           <input
+            className="dp-input"
             placeholder="Ex: Autoconhecimento Março"
             value={filters.search}
             onChange={(event) => setFilters((prev) => ({ ...prev, search: event.target.value }))}
@@ -95,6 +96,7 @@ export const DashboardPage = () => {
         <label style={{ display: 'grid', gap: 4 }}>
           <span>Status</span>
           <select
+            className="dp-select"
             value={filters.status}
             onChange={(event) => setFilters((prev) => ({ ...prev, status: event.target.value }))}
           >
@@ -105,15 +107,16 @@ export const DashboardPage = () => {
         </label>
       </section>
 
-      <section style={{ marginBottom: 16 }}>
-        <form onSubmit={handleCreateProject} style={{ display: 'grid', gap: 8, maxWidth: 500 }}>
+      <section style={{ marginBottom: 16 }} className="mystic-panel">
+        <form onSubmit={handleCreateProject} className="dp-form" style={{ maxWidth: 560 }}>
           <h2>Novo Ciclo</h2>
-          <p style={{ margin: 0 }}>
+          <p className="page-subtitle" style={{ margin: 0 }}>
             Um ciclo é o espaço onde seus sonhos e ações ficam organizados.
           </p>
           <label style={{ display: 'grid', gap: 4 }}>
             <span>Título do ciclo *</span>
             <input
+              className="dp-input"
               placeholder="Ex: Ciclo de Clareza"
               value={form.title}
               onChange={(event) => setForm({ ...form, title: event.target.value })}
@@ -125,6 +128,7 @@ export const DashboardPage = () => {
           <label style={{ display: 'grid', gap: 4 }}>
             <span>Descrição</span>
             <textarea
+              className="dp-textarea"
               placeholder="Ex: Quero entender padrões dos meus sonhos sobre carreira e relações."
               value={form.description}
               onChange={(event) => setForm({ ...form, description: event.target.value })}
@@ -135,6 +139,7 @@ export const DashboardPage = () => {
           <label style={{ display: 'grid', gap: 4 }}>
             <span>Tags (separadas por vírgula)</span>
             <input
+              className="dp-input"
               placeholder="Ex: carreira, ansiedade, família"
               value={form.tags}
               onChange={(event) => setForm({ ...form, tags: event.target.value })}
@@ -142,27 +147,27 @@ export const DashboardPage = () => {
           </label>
           <small>Use palavras-chave para filtrar depois.</small>
 
-          <button type="submit">Criar ciclo</button>
+          <button type="submit" className="dp-btn">Criar ciclo</button>
         </form>
       </section>
 
-      <section>
+      <section className="mystic-panel">
         <h2>Seus Ciclos</h2>
-        {projects.length === 0 ? <p>Você ainda não criou ciclos.</p> : null}
-        <ul>
+        {projects.length === 0 ? <p className="page-subtitle">Você ainda não criou ciclos.</p> : null}
+        <ul className="dp-list">
           {projects.map((project) => (
-            <li key={project._id}>
+            <li key={project._id} className="dp-list-item">
               <Link to={`/projects/${project._id}`}>{project.title}</Link> ·{' '}
-              {project.status === 'active' ? 'Ativo' : 'Arquivado'} ·{' '}
-              <button type="button" onClick={() => handleEditCycle(project)}>
+              <span className="dp-meta">{project.status === 'active' ? 'Ativo' : 'Arquivado'}</span> ·{' '}
+              <button type="button" className="dp-btn dp-btn-secondary" onClick={() => handleEditCycle(project)}>
                 Editar
               </button>{' '}
               {project.status === 'active' ? (
-                <button type="button" onClick={() => handleArchiveCycle(project._id)}>
+                <button type="button" className="dp-btn dp-btn-secondary" onClick={() => handleArchiveCycle(project._id)}>
                   Arquivar
                 </button>
               ) : (
-                <button type="button" onClick={() => handleReactivateCycle(project._id)}>
+                <button type="button" className="dp-btn dp-btn-secondary" onClick={() => handleReactivateCycle(project._id)}>
                   Reativar
                 </button>
               )}
@@ -171,7 +176,7 @@ export const DashboardPage = () => {
         </ul>
       </section>
 
-      {error ? <p style={{ color: 'crimson' }}>{error}</p> : null}
+      {error ? <p className="dp-error">{error}</p> : null}
     </main>
   );
 };

@@ -22,11 +22,13 @@ export const SignupPage = () => {
   };
 
   return (
-    <main>
-      <h1>Criar conta no DreamerPortal</h1>
-      <p>Comece seu ciclo registrando sonhos, significados e ações.</p>
-      <form onSubmit={handleSubmit} style={{ display: 'grid', gap: 8, maxWidth: 360 }}>
-        <input
+    <main className="auth-layout">
+      <section className="auth-card">
+        <h1>Criar conta no DreamerPortal</h1>
+        <p>Comece seu ciclo registrando sonhos, significados e ações.</p>
+        <form onSubmit={handleSubmit} className="dp-form">
+          <input
+            className="dp-input"
           placeholder="Seu nome"
           minLength={2}
           maxLength={80}
@@ -34,14 +36,16 @@ export const SignupPage = () => {
           value={form.name}
           onChange={(event) => setForm({ ...form, name: event.target.value })}
         />
-        <input
+          <input
+            className="dp-input"
           placeholder="Seu e-mail"
           type="email"
           required
           value={form.email}
           onChange={(event) => setForm({ ...form, email: event.target.value })}
         />
-        <input
+          <input
+            className="dp-input"
           placeholder="Crie uma senha"
           type="password"
           minLength={8}
@@ -50,12 +54,13 @@ export const SignupPage = () => {
           value={form.password}
           onChange={(event) => setForm({ ...form, password: event.target.value })}
         />
-        <button type="submit">Criar conta</button>
-      </form>
-      {error ? <p style={{ color: 'crimson' }}>{error}</p> : null}
-      <p>
-        Já tem conta? <Link to="/login">Entrar</Link>
-      </p>
+          <button type="submit" className="dp-btn">Criar conta</button>
+        </form>
+        {error ? <p className="dp-error">{error}</p> : null}
+        <p>
+          Já tem conta? <Link to="/login">Entrar</Link>
+        </p>
+      </section>
     </main>
   );
 };
