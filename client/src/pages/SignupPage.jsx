@@ -6,11 +6,18 @@ export const SignupPage = () => {
   const navigate = useNavigate();
   const { signup } = useAuth();
   const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [consentAccepted, setConsentAccepted] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
+
+    if (!consentAccepted) {
+      setError('Você precisa aceitar o consentimento para continuar');
+      return;
+    }
+
     try {
       await signup(form);
       navigate('/dashboard');
@@ -54,6 +61,16 @@ export const SignupPage = () => {
           value={form.password}
           onChange={(event) => setForm({ ...form, password: event.target.value })}
         />
+          <label className="dp-checkline">
+            <input
+              type="checkbox"
+              checked={consentAccepted}
+              onChange={(event) => setConsentAccepted(event.target.checked)}
+            />
+            <span>
+              Concordo que sonhos são dados sensíveis e que as interpretações da IA são simbólicas, não diagnósticos.
+            </span>
+          </label>
           <button type="submit" className="dp-btn">Criar conta</button>
         </form>
         {error ? <p className="dp-error">{error}</p> : null}

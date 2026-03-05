@@ -35,7 +35,41 @@ const processDream = async (dreamId) => {
   }
 
   try {
-    const result = await resolveDreamInterpretation(dream.toObject());
+    const recentDreams = await Dream.find({
+      owner: dream.owner,
+      project: dream.project,
+      _id: { $ne: dream._id },
+      deletedAt: null
+    })
+      .sort({ dreamDate: -1, createdAt: -1 })
+      .limit(5)
+      .select('title moodTags analysis.symbols analysis.archetypes');
+
+    const temporalContext = {
+      recentDreamThemes: recentDreams
+        .flatMap((item) => [
+          ...(Array.isArray(item.analysis?.symbols) ? item.analysis.symbols : []),
+          ...(Array.isArray(item.analysis?.archetypes) ? item.analysis.archetypes : [])
+        ])
+        .filter(Boolean)
+        .slice(0, 8),
+      recentDreamTitles: recentDreams.map((item) => item.title).filter(Boolean)
+    };
+
+    const result = await resolveDreamInterpretation(dream.toObject(), temporalContext);
+
+    const interpretationLayer = {
+      kind: 'primary',
+      summary: result.summary,
+      symbols: result.symbols,
+      archetypes: result.archetypes,
+      suggestedAction: result.suggestedAction,
+      source: result.source,
+      model: result.model,
+      disclaimer: result.disclaimer,
+      createdAt: new Date()
+    };
+
     await Dream.findByIdAndUpdate(dream._id, {
       $set: {
         'analysis.status': 'processed',
@@ -48,7 +82,14 @@ const processDream = async (dreamId) => {
         'analysis.model': result.model,
         'analysis.processed': true,
         'analysis.processedAt': new Date(),
+        'analysis.userDecision': 'pending',
         'analysis.error': ''
+      },
+      $push: {
+        interpretationLayers: {
+          $each: [interpretationLayer],
+          $slice: -20
+        }
       }
     });
   } catch (error) {

@@ -24,5 +24,9 @@ export const dreamsService = {
   analyze: async (dreamId) => {
     const { data } = await http.post(`/api/dreams/${dreamId}/analyze`);
     return data;
+  },
+  setAnalysisDecision: async (dreamId, decision) => {
+    const { data } = await http.post(`/api/dreams/${dreamId}/analysis-decision`, { decision });
+    return data;
   }
 };

@@ -175,6 +175,18 @@ a {
   flex-wrap: wrap;
 }
 
+.dp-checkline {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  color: var(--dp-muted);
+  font-size: 13px;
+}
+
+.dp-checkline input {
+  margin-top: 2px;
+}
+
 .dp-list {
   list-style: none;
   margin: 0;

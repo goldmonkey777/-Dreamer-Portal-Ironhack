@@ -47,9 +47,11 @@ export const createDream = async (ownerId, projectId, payload) => {
       symbols: [],
       archetypes: [],
       suggestedAction: '',
+      userDecision: 'pending',
       processed: false,
       error: ''
-    }
+    },
+    interpretationLayers: []
   });
 
   enqueueDreamAnalysis(created._id);
@@ -68,41 +70,24 @@ export const getDreamById = async (ownerId, dreamId) => {
 
 export const updateDream = async (ownerId, dreamId, payload) => {
   ensureObjectId(dreamId);
-  const shouldReprocessAnalysis =
-    payload.title !== undefined ||
-    payload.content !== undefined ||
-    payload.moodTags !== undefined ||
-    payload.lucidityLevel !== undefined ||
-    payload.dreamDate !== undefined;
+  const forbiddenRawFields = ['title', 'content', 'dreamDate', 'moodTags', 'lucidityLevel'];
+  const attemptedRawUpdate = forbiddenRawFields.some((field) => payload[field] !== undefined);
+  if (attemptedRawUpdate) {
+    throw new AppError('Dream record is immutable after creation', 400);
+  }
+
+  const mutablePayload = {
+    ...(payload.isArchived !== undefined ? { isArchived: payload.isArchived } : {})
+  };
 
   const updated = await Dream.findOneAndUpdate(
     { _id: dreamId, owner: ownerId, deletedAt: null },
-    {
-      ...payload,
-      ...(payload.moodTags ? { moodTags: payload.moodTags.map((tag) => tag.toLowerCase()) } : {}),
-      ...(shouldReprocessAnalysis
-        ? {
-            analysis: {
-              status: 'pending',
-              summary: '',
-              symbols: [],
-              archetypes: [],
-              suggestedAction: '',
-              processed: false,
-              error: ''
-            }
-          }
-        : {})
-    },
+    mutablePayload,
     { new: true }
   );
 
   if (!updated) {
     throw new AppError('Dream not found', 404);
-  }
-
-  if (shouldReprocessAnalysis) {
-    enqueueDreamAnalysis(updated._id);
   }
 
   return updated;
@@ -136,10 +121,21 @@ export const requestDreamAnalysis = async (ownerId, dreamId) => {
   dream.analysis = {
     ...dream.analysis,
     status: 'pending',
+    userDecision: 'pending',
     processed: false,
     error: ''
   };
   await dream.save();
   enqueueDreamAnalysis(dream._id);
+  return dream;
+};
+
+export const setDreamAnalysisDecision = async (ownerId, dreamId, decision) => {
+  const dream = await getDreamById(ownerId, dreamId);
+  dream.analysis = {
+    ...dream.analysis,
+    userDecision: decision
+  };
+  await dream.save();
   return dream;
 };

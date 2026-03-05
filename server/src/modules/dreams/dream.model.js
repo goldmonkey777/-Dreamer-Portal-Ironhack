@@ -15,6 +15,7 @@ const dreamSchema = new mongoose.Schema(
         type: String
       }
     ],
+    rawRecordLocked: { type: Boolean, default: true },
     analysis: {
       status: {
         type: String,
@@ -32,10 +33,32 @@ const dreamSchema = new mongoose.Schema(
       },
       source: { type: String, default: 'pending' },
       model: { type: String, default: '' },
+      userDecision: {
+        type: String,
+        enum: ['pending', 'accepted', 'ignored'],
+        default: 'pending'
+      },
       processed: { type: Boolean, default: false },
       processedAt: { type: Date, default: null },
       error: { type: String, default: '' }
     },
+    interpretationLayers: [
+      {
+        kind: {
+          type: String,
+          enum: ['primary', 'jungian', 'tarot', 'mythological', 'personal-pattern', 'other'],
+          default: 'primary'
+        },
+        summary: { type: String, default: '' },
+        symbols: [{ type: String }],
+        archetypes: [{ type: String }],
+        suggestedAction: { type: String, default: '' },
+        source: { type: String, default: '' },
+        model: { type: String, default: '' },
+        disclaimer: { type: String, default: '' },
+        createdAt: { type: Date, default: Date.now }
+      }
+    ],
     isArchived: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null, index: true }
   },

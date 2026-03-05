@@ -39,3 +39,16 @@ export const analyzeDream = asyncHandler(async (req, res) => {
     data: dream
   });
 });
+
+export const setDreamAnalysisDecision = asyncHandler(async (req, res) => {
+  const dream = await dreamService.setDreamAnalysisDecision(
+    req.user.id,
+    req.params.id,
+    req.body.decision
+  );
+  res.status(200).json({
+    success: true,
+    message: 'Interpretation decision saved',
+    data: dream
+  });
+});

@@ -21,6 +21,7 @@ export const ProjectDetailPage = () => {
     moodTags: '',
     lucidityLevel: 3
   });
+  const [dreamInterpretationConsent, setDreamInterpretationConsent] = useState(false);
   const [dreamAttachmentDataUri, setDreamAttachmentDataUri] = useState('');
   const [dreamAttachmentFileName, setDreamAttachmentFileName] = useState('');
   const [taskForm, setTaskForm] = useState({ title: '', description: '', status: 'todo', priority: 'medium' });
@@ -62,6 +63,11 @@ export const ProjectDetailPage = () => {
 
   const submitDream = async (event) => {
     event.preventDefault();
+    if (!dreamInterpretationConsent) {
+      setError('Você precisa concordar com a natureza simbólica da interpretação para continuar');
+      return;
+    }
+
     try {
       const createdDream = await dreamsService.create(id, {
         ...dreamForm,
@@ -78,6 +84,7 @@ export const ProjectDetailPage = () => {
       setDreamForm({ title: '', content: '', dreamDate: '', moodTags: '', lucidityLevel: 3 });
       setDreamAttachmentDataUri('');
       setDreamAttachmentFileName('');
+      setDreamInterpretationConsent(false);
       await loadData();
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Não foi possível criar o sonho');
@@ -128,30 +135,6 @@ export const ProjectDetailPage = () => {
     }
   };
 
-  const handleEditDream = async (dream) => {
-    const title = window.prompt('Editar título do sonho:', dream.title);
-    if (!title) {
-      return;
-    }
-    const content = window.prompt('Editar conteúdo do sonho:', dream.content);
-    if (!content) {
-      return;
-    }
-
-    try {
-      await dreamsService.update(dream._id, {
-        title,
-        content,
-        dreamDate: dream.dreamDate,
-        moodTags: dream.moodTags,
-        lucidityLevel: dream.lucidityLevel
-      });
-      await loadData();
-    } catch (requestError) {
-      setError(requestError.response?.data?.message || 'Não foi possível editar o sonho');
-    }
-  };
-
   const handleDeleteDream = async (dreamId) => {
     const confirmed = window.confirm('Arquivar este sonho?');
     if (!confirmed) {
@@ -172,6 +155,15 @@ export const ProjectDetailPage = () => {
       await loadData();
     } catch (requestError) {
       setError(requestError.response?.data?.message || 'Não foi possível solicitar análise do sonho');
+    }
+  };
+
+  const handleInterpretationDecision = async (dreamId, decision) => {
+    try {
+      await dreamsService.setAnalysisDecision(dreamId, decision);
+      await loadData();
+    } catch (requestError) {
+      setError(requestError.response?.data?.message || 'Não foi possível salvar sua decisão');
     }
   };
 
@@ -331,6 +323,17 @@ export const ProjectDetailPage = () => {
             </label>
             {dreamAttachmentFileName ? <small>Arquivo selecionado: {dreamAttachmentFileName}</small> : null}
 
+            <label className="dp-checkline">
+              <input
+                type="checkbox"
+                checked={dreamInterpretationConsent}
+                onChange={(event) => setDreamInterpretationConsent(event.target.checked)}
+              />
+              <span>
+                Entendo que a IA oferece apenas interpretações simbólicas e que a decisão final é sempre minha.
+              </span>
+            </label>
+
             <button type="submit" className="dp-btn">Salvar sonho</button>
           </form>
 
@@ -345,9 +348,6 @@ export const ProjectDetailPage = () => {
               <li key={dream._id} className="dp-list-item">
                 <strong>{dream.title}</strong> · {new Date(dream.dreamDate).toLocaleDateString()} · Lucidez{' '}
                 {dream.lucidityLevel}{' '}
-                <button type="button" className="dp-btn dp-btn-secondary" onClick={() => handleEditDream(dream)}>
-                  Editar
-                </button>{' '}
                 <button type="button" className="dp-btn dp-btn-secondary" onClick={() => handleDeleteDream(dream._id)}>
                   Arquivar
                 </button>
@@ -414,6 +414,32 @@ export const ProjectDetailPage = () => {
                     {dream.analysis?.suggestedAction ? (
                       <small>Ação sugerida: {dream.analysis.suggestedAction}</small>
                     ) : null}
+                    <small>
+                      Sua decisão sobre este insight:{' '}
+                      <span className="dp-chip">
+                        {dream.analysis?.userDecision === 'accepted'
+                          ? 'Aceito'
+                          : dream.analysis?.userDecision === 'ignored'
+                            ? 'Ignorado'
+                            : 'Pendente'}
+                      </span>
+                    </small>
+                    <div className="dp-row" style={{ marginTop: 4 }}>
+                      <button
+                        type="button"
+                        className="dp-btn dp-btn-secondary"
+                        onClick={() => handleInterpretationDecision(dream._id, 'accepted')}
+                      >
+                        Aceitar insight
+                      </button>
+                      <button
+                        type="button"
+                        className="dp-btn dp-btn-secondary"
+                        onClick={() => handleInterpretationDecision(dream._id, 'ignored')}
+                      >
+                        Ignorar insight
+                      </button>
+                    </div>
                     <small style={{ opacity: 0.8 }}>
                       {dream.analysis?.disclaimer ||
                         'Esta interpretação é simbólica e reflexiva. Não substitui aconselhamento profissional.'}

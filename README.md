@@ -11,6 +11,8 @@ Fluxo central do domínio:
 
 Dream → Meaning-ready Analysis → Action Task
 
+Leis imutáveis do core: ver `Docs/MANIFESTO.md`.
+
 ## Backend setup
 
 1. Copy `server/.env.example` to `server/.env`
@@ -42,6 +44,7 @@ npm run dev
 - Projects: `GET/POST /api/projects`, `GET/PUT/DELETE /api/projects/:id`
 - Dreams: `GET/POST /api/projects/:projectId/dreams`, `GET/PUT/DELETE /api/dreams/:id`
 - Dreams Analysis: `POST /api/dreams/:id/analyze` (async reprocessing)
+- Dreams Analysis Decision: `POST /api/dreams/:id/analysis-decision` (`pending|accepted|ignored`)
 - Tasks: `GET/POST /api/projects/:projectId/tasks`, `PUT/DELETE /api/tasks/:id`
 
 All domain routes are owner-scoped and implement soft delete where applicable.
@@ -56,6 +59,16 @@ All domain routes are owner-scoped and implement soft delete where applicable.
 - Filtros de ciclos, sonhos e ações
 - Upload de imagem para sonho via Cloudinary (UI + API)
 - Interpretação simbólica assíncrona de sonhos (OpenAI opcional + fallback heurístico local)
+- Histórico de múltiplas interpretações por sonho (camada derivada)
+- Registro explícito da decisão do usuário sobre insights (aceitar/ignorar)
+
+## Core governance checklist (before merge)
+
+- [ ] A feature states lifecycle compatibility: Dream → Interpretation → Insight → Action
+- [ ] AI output remains symbolic and non-deterministic
+- [ ] Raw dream record remains immutable after creation
+- [ ] User sovereignty is preserved (accept/ignore/edit interpretation layer)
+- [ ] Privacy-sensitive handling is documented
 
 ## Como testar upload de imagem
 

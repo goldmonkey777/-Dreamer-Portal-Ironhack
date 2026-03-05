@@ -9,13 +9,12 @@ export const createDreamSchema = Joi.object({
 });
 
 export const updateDreamSchema = Joi.object({
-  title: Joi.string().min(2).max(160),
-  content: Joi.string().min(3),
-  dreamDate: Joi.date(),
-  moodTags: Joi.array().items(Joi.string().max(40)),
-  lucidityLevel: Joi.number().integer().min(1).max(5),
   isArchived: Joi.boolean()
 }).min(1);
+
+export const analysisDecisionSchema = Joi.object({
+  decision: Joi.string().valid('pending', 'accepted', 'ignored').required()
+});
 
 export const listDreamQuerySchema = Joi.object({
   mood: Joi.string().max(40),

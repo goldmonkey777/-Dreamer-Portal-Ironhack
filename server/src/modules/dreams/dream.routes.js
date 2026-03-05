@@ -7,10 +7,12 @@ import {
   deleteDream,
   getDream,
   listDreamsByProject,
+  setDreamAnalysisDecision,
   updateDream,
   uploadDreamAttachment
 } from './dream.controller.js';
 import {
+  analysisDecisionSchema,
   createDreamSchema,
   listDreamQuerySchema,
   updateDreamSchema,
@@ -27,3 +29,4 @@ dreamRoutes.put('/dreams/:id', validate(updateDreamSchema), updateDream);
 dreamRoutes.delete('/dreams/:id', deleteDream);
 dreamRoutes.post('/dreams/:id/attachments', validate(uploadAttachmentSchema), uploadDreamAttachment);
 dreamRoutes.post('/dreams/:id/analyze', analyzeDream);
+dreamRoutes.post('/dreams/:id/analysis-decision', validate(analysisDecisionSchema), setDreamAnalysisDecision);
